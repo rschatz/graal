@@ -1052,6 +1052,7 @@ suite = {
       },
       "license" : "BSD-new",
       "testDistribution" : True,
+      "defaultBuild" : False,
     },
 
     "SULONG_TEST_NATIVE" : {
