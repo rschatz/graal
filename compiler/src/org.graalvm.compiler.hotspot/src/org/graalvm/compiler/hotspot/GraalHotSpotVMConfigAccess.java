@@ -195,7 +195,17 @@ public class GraalHotSpotVMConfigAccess {
                 messages.add(String.format("VM config values not expected to be present in %s:%n    %s", runtime,
                                 unexpected.stream().sorted().collect(Collectors.joining(System.lineSeparator() + "    "))));
             }
-            throw new JVMCIError(String.join(System.lineSeparator(), messages));
+            JVMCIError error = new JVMCIError(String.join(System.lineSeparator(), messages));
+            for (StackTraceElement e : error.getStackTrace()) {
+                if (e.getMethodName().equals("<clinit>")) {
+                    // Frameworks such as JUnit can swallow class initialization errors
+                    // so print the error now since it can be lost (e.g. see
+                    // https://bugs.openjdk.java.net/browse/JDK-8048190)
+                    error.printStackTrace();
+                    break;
+                }
+            }
+            throw error;
         }
     }
 
